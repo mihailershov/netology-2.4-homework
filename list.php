@@ -4,6 +4,13 @@
 
     $allFiles = glob('tests/*.json');
 
+    if (!empty($_POST['del'])) {
+        $path = $_POST['path'];
+        if (file_exists($path)) {
+            unlink($path);
+        }
+        unset($allFiles[array_search($path, $allFiles, true)]);
+    }
 ?>
 <!doctype html>
 <html lang="en">

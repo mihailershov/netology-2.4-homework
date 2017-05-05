@@ -88,16 +88,18 @@ function checkUploadedFile($file) {
 // Отображает все загруженные тесты
 function dispayAllTests($allTests) {
     foreach ($allTests as $file) {
-        echo '<div class="file-block">';
+        if (array_search($file, $allTests, true)) {
+            echo '<div class="file-block">';
             echo '<h1>' . str_replace('tests/', '', $file) . '</h1><br>';
             echo '<em>Загружен: ' . date("d-m-Y H:i", filemtime($file)) . '</em><br>';
             echo '<a href="test.php?number=' . array_search($file, $allTests) . '">Перейти на страницу с тестом ></a><br>';
             echo '<form method="POST">';
-                echo "<input type=\"hidden\" name=\"path\" value=\"$file\">";
-                echo '<input type="submit" name="del" value="Удалить тест">';
+            echo "<input type=\"hidden\" name=\"path\" value=\"$file\">";
+            echo '<input type="submit" name="del" value="Удалить тест">';
             echo '</form>';
-        echo '</div>';
-        echo '<hr>';
+            echo '</div>';
+            echo '<hr>';
+        }
     }
 }
 
