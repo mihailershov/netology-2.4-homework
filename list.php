@@ -1,38 +1,47 @@
 <?php
 
-    require_once 'core.php';
+require_once 'src/core.php';
 
-    $allFiles = glob('tests/*.json');
+if (!isAuthorized() && !isQuest()) {
+    location('admin.php');
+}
 
-    if (!empty($_POST['del'])) {
-        $path = $_POST['path'];
-        if (file_exists($path)) {
-            unlink($path);
-        }
-        unset($allFiles[array_search($path, $allFiles, true)]);
-    }
+$allFiles = glob('tests/*.json');
+
+if (!empty($_POST['path'])) {
+    $allFiles = delTest($allFiles);
+    header('refresh: 0');
+}
+
+//echo $_SESSION['counter']++;
+
 ?>
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Test's list</title>
     <link rel="stylesheet" href="styles/list.css">
 </head>
 <body>
-    <a href="admin.php" class="back"><div>< Назад</div></a>
-    <h2>Все тесты</h2>
-    <hr>
+<a href="admin.php" class="back">
+    <div>&lt; Назад</div>
+</a>
+<h2>Все тесты</h2>
+<hr>
 
-    <!-- Выводим все тесты -->
+<!-- Выводим все тесты -->
 
-    <?php if (!empty($allFiles)): ?>
-        <?php dispayAllTests($allFiles); ?>
-    <?php else: ?>
-        <?php echo 'Пока не загружено ни одного теста'; ?>
-    <?php endif; ?>
+<?php if (!empty($allFiles)): ?>
+    <?php dispayAllTests($allFiles); ?>
+<?php else: ?>
+    <?php echo 'Пока не загружено ни одного теста'; ?>
+<?php endif; ?>
 
+<!-- <script src="js/jquery.min.js"></script>
+<script src="js/list.js"></script> -->
 </body>
 </html>

@@ -1,8 +1,16 @@
 <?php
 
+header('Content-type: image/png');
+
+$testname = $_POST['testname'];
+$username = $_POST['username'];
+$date = $_POST['date'];
+$correctAnswers = $_POST['correctAnswers'];
+$totalAnswers = $_POST['totalAnswers'];
+
 $answers = $correctAnswers . ' из ' . $totalAnswers;
 
-// Создаем картинку и цвет шрифта
+// Создаем картинку, размер и цвет шрифта
 $img = imagecreatefromjpeg('img/picture.jpg');
 $white = imagecolorallocate($img,255,255,255);
 
@@ -20,5 +28,5 @@ imagettftext($img, 180, 0, 1600, 1976, $white, 'fonts/OpenSans.ttf', $answers);
 imagettftext($img, 180, 0, 1600, 2325, $white, 'fonts/OpenSans.ttf', $date);
 
 // Возвращаем картинку
-imagepng($img, 'img/result.png');
+imagepng($img);
 imagedestroy($img);

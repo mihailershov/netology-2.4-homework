@@ -2,7 +2,8 @@
 
 
 // Проверка теста, вывод ответа пользователя и правильного ответа
-function checkTest($testFile) {
+function checkTest($testFile)
+{
 
     // Проверяем, решены ли все задания
     foreach ($testFile as $key => $item) {
@@ -25,17 +26,18 @@ function checkTest($testFile) {
 
         // Вывод блока с вопросом и ответом
         echo '<div class=' . $infoStyle . '>' .
-                 'Вопрос: ' . $item['question'] . '<br>' .
-                 'Ваш ответ: ' . $item['answers'][$_POST['answer' . $key]] . '<br>' .
-                 'Правильный ответ: ' . $item['answers'][$item['correct_answer']] . '<br>' .
-             '</div>' .
-             '<hr>';
+            'Вопрос: ' . $item['question'] . '<br>' .
+            'Ваш ответ: ' . $item['answers'][$_POST['answer' . $key]] . '<br>' .
+            'Правильный ответ: ' . $item['answers'][$item['correct_answer']] . '<br>' .
+            '</div>' .
+            '<hr>';
     }
 }
 
 
 // Счетчик правильных ответов в тесте
-function answersCounter($testFile) {
+function answersCounter($testFile)
+{
 
     $i = 0;
     $questions = 0;
@@ -52,7 +54,8 @@ function answersCounter($testFile) {
 
 
 // Проверка файла перед загрузкой
-function checkUploadedFile($file) {
+function checkUploadedFile($file)
+{
 
     $uploadfile = 'tests/' . basename($file['name']);
     $allFiles = !empty(glob('tests/*.json')) ? glob('tests/*.json') : $allFiles = [];
@@ -86,24 +89,30 @@ function checkUploadedFile($file) {
 }
 
 // Отображает все загруженные тесты
-function dispayAllTests($allTests) {
-    foreach ($allTests as $file) {
-        if (array_search($file, $allTests, true)) {
+function dispayAllTests($allTests)
+{
+    $i = 0;
+    while ($i < count($allTests)) {
+        if (in_array($allTests[$i], $allTests, true)) {
             echo '<div class="file-block">';
-            echo '<h1>' . str_replace('tests/', '', $file) . '</h1><br>';
-            echo '<em>Загружен: ' . date("d-m-Y H:i", filemtime($file)) . '</em><br>';
-            echo '<a href="test.php?number=' . array_search($file, $allTests) . '">Перейти на страницу с тестом ></a><br>';
-            echo '<form method="POST">';
-            echo "<input type=\"hidden\" name=\"path\" value=\"$file\">";
-            echo '<input type="submit" name="del" value="Удалить тест">';
-            echo '</form>';
+            echo '<h1>' . str_replace('tests/', '', $allTests[$i]) . '</h1><br>';
+            echo '<em>Загружен: ' . date("d-m-Y H:i", filemtime($allTests[$i])) . '</em><br>';
+            echo '<a href="test.php?number=' . array_search($allTests[$i], $allTests) . '">Перейти на страницу с тестом &blacktriangleright;</a><br>';
+            if (isAuthorized()) {
+                echo '<form method="POST">';
+                echo "<input type=\"hidden\" name=\"path\" value=\"$allTests[$i]\">";
+                echo '<input type="submit" name="del" value="Удалить тест" class="del">';
+                echo '</form>';
+            }
             echo '</div>';
             echo '<hr>';
+            $i++;
         }
     }
 }
 
-function login($login, $password) {
+function login($login, $password)
+{
     $users = getUsers();
     foreach ($users as $user) {
         if ($user['login'] == $login && $user['password'] == $password) {
@@ -115,8 +124,9 @@ function login($login, $password) {
     return false;
 }
 
-function getUsers() {
-    $path = __DIR__ . '/json/users.json';
+function getUsers()
+{
+    $path = __DIR__ . '/users.json';
     $fileData = file_get_contents($path);
     $data = json_decode($fileData, true);
     if (!$data) {
@@ -125,39 +135,105 @@ function getUsers() {
     return $data;
 }
 
-function getLoggedUserData() {
+function getLoggedUserData()
+{
     if (!isset($_SESSION['user'])) {
         return null;
     }
     return $_SESSION['user'];
 }
 
-function isAuthorized() {
-    return getLoggedUserData() !== null;
+function isAuthorized()
+{
+    return (getLoggedUserData() !== null);
 }
 
-function getQuestUserData() {
+function getQuestUserData()
+{
     if (!isset($_SESSION['quest'])) {
         return null;
     }
     return $_SESSION['quest'];
 }
 
-function isQuest() {
+function isQuest()
+{
     return getQuestUserData() !== null;
 }
 
-function location($path) {
+function location($path)
+{
     header("Location: $path");
     die;
 }
 
-function isPOST() {
+function isPOST()
+{
     return $_SERVER['REQUEST_METHOD'] === 'POST';
 }
 
-function logout() {
+function logout()
+{
     session_destroy();
-    location('index.php');
+    location('../index.php');
+}
+
+function delTest($files)
+{
+    $path = $_POST['path'];
+    if (file_exists($path)) {
+        unlink($path);
+    }
+    unset($files[array_search($path, $files, true)]);
+    return glob('tests/*.json');
+}
+
+function generateCode()
+{
+    $chars = 'abdefhknrstyz23456789';
+    $length = rand(4, 6);
+    $numChars = strlen($chars);
+    $str = '';
+    for ($i = 0; $i < $length; $i++) {
+        $str .= substr($chars, rand(1, $numChars) - 1, 1);
+    }
+    return $str;
+}
+
+function imgCode($code) // $code - код нашей капчи, который мы укажем при вызове функции
+{
+
+    header('Content-type: image/png');
+
+    $font = '../fonts/OpenSans.ttf';
+
+    $im = imagecreatetruecolor(200, 50);
+    $bg = imagecolorallocate($im, mt_rand(0, 100), mt_rand(0, 100), mt_rand(0, 100));
+    imagefill($im, 0, 0, $bg);
+
+    $x = mt_rand(0, 35);
+    for($i = 0; $i < strlen($code); $i++) {
+        $x+=mt_rand(15, 25);
+        $fontSize = mt_rand(20, 30);
+        $color = imagecolorallocate($im, mt_rand(100, 200), mt_rand(100, 200), mt_rand(100, 200));
+        $letter = substr($code, $i, 1);
+        imagettftext($im, $fontSize, mt_rand(2, 10  ), $x, mt_rand(30, 40), $color, $font, $letter);
+    }
+
+    imagepng($im);
+    imagedestroy($im);
+}
+
+function checkCaptcha($userCaptcha, $cookieCaptcha) {
+
+    $userCaptcha = strtolower(trim($userCaptcha));
+    $userCaptcha = md5($userCaptcha);
+
+    return $userCaptcha === $cookieCaptcha;
+}
+
+function banUser() {
+    setcookie('ban', 'banned', time() + 10, '/', $_SERVER['HTTP_HOST']);
+    session_destroy();
 }
 

@@ -1,6 +1,6 @@
 <?php
 
-require_once 'core.php';
+require_once 'src/core.php';
 
 if (!isAuthorized() && !isQuest()) {
     location('index.php');
@@ -14,6 +14,8 @@ if (isset($_POST['upload'])) {
     $file = $_FILES['testfile'];
     $uploadResult = checkUploadedFile($file);
 }
+
+//echo $_SESSION['counter']++;
 
 ?>
 <!doctype html>
@@ -30,22 +32,22 @@ if (isset($_POST['upload'])) {
 <!-- Если файл был отправлен, то выводить информацию о файле и уведомление об успешной загрузке/ошибке -->
 
 <?php if (isset($_POST['upload'])): ?>
-    <a href="<?php $_SERVER['HTTP_REFERER'] ?>"><div>< Назад</div></a>
+    <a href="<?php $_SERVER['HTTP_REFERER'] ?>"><div>&lt; Назад</div></a>
     <p class="<?php echo $uploadResult['classname'] ?>"><?php echo $uploadResult['message']; ?></p><br>
-    <h1>Вы будете перенаправлены на страницу с тестами через 3 секунды...</h1>
+    <h1>Перенаправление на страницу с тестами...</h1>
 <?php endif; ?>
 
 <!-- Пока файл или форма теста не была отправлена, выводить форму загрузки и форму создания теста -->
 
 <?php if (!isset($_POST['upload'])): ?>
-    <a href="logout.php" class="back"><div>< Разлогиниться</div></a>
+    <a href="src/logout.php" class="back"><div>&lt; Разлогиниться</div></a>
     <!-- Если пользователь зашел как гость, то запретить загружать тесты -->
 
     <?php if (isAuthorized()): ?>
-        <h1>Здравствуй, <span style="font-style: italic;"><?php echo $_SESSION['user']['name'] ?></span></h1>
+        <h1>Здравствуй, <span style="font-style: italic;"><?php echo $_SESSION['user']['name'] ?> (admin)</span></h1>
         <form id="load-json" method="POST" enctype="multipart/form-data">
             <fieldset>
-                <legend>Загрузите свой тест в формате json</legend>
+                <legend>Загрузка теста в формате json</legend>
                 <input type="file" name="testfile" id="uploadfile" required>
                 <input type="submit" value="Добавить в базу" id="submit-upload" name="upload">
             </fieldset>
@@ -53,11 +55,11 @@ if (isset($_POST['upload'])) {
     <?php endif; ?>
 
     <?php if (isQuest()): ?>
-        <h1>Здравствуй, <span style="font-style: italic;"><?php echo $_SESSION['quest']['username'] ?></span></h1>
+        <h1>Здравствуй, <span style="font-style: italic;"><?php echo $_SESSION['quest']['username'] ?> (quest)</span></h1>
     <?php endif; ?>
         <div class="all-tests">
             <fieldset>
-                <a href="list.php">Посмотреть все тесты >></a>
+                <a href="list.php">Посмотреть все тесты</a>
             </fieldset>
         </div>
 
